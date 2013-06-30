@@ -27,6 +27,7 @@ def common_factors(m, n):
 
 
 class Assoc(object):
+    """An association between a product and a customer"""
     def __init__(self, prod, cust, ss=0.0):
         self.prod = prod
         self.cust = cust
@@ -48,6 +49,7 @@ class Assoc(object):
 re_letters = re.compile('[a-z]', re.I)
 re_vowels = re.compile('[aeiouy]', re.I)
 re_cons = re.compile('[^aeiouy\s]', re.I)
+
 test_cases = open(sys.argv[1], 'r')
 
 for test in test_cases:
@@ -56,6 +58,7 @@ for test in test_cases:
     customers, products = [(t.split(','), t.split(','))[0]
                             for t in test.strip().split(';')]
 
+    # Create all customer-product associations and calculate their SS
     assocs = []
     for cust in customers:
         c = ''.join(re_letters.findall(cust))
@@ -70,10 +73,14 @@ for test in test_cases:
             assocs.append(Assoc(pr, cust, ss))
 
     def get_combination(a, ass):
+        """Return the combination of a given association within a given
+        association list, such that each product is offered only once and
+        each product goes to a single customer."""
         comb = [a]
         for i in ass:
-            isin = [i.prod != comb[k].prod and i.cust != comb[k].cust for k in range(len(comb))]
-            if all(isin):
+            candidate = [i.prod != comb[k].prod and i.cust != comb[k].cust
+                    for k in range(len(comb))]
+            if all(candidate):
                 comb.append(i)
         return comb
 
@@ -85,6 +92,7 @@ for test in test_cases:
     #pprint(all_combs)
     #import ipdb; ipdb.set_trace()
 
+    # Calculate the max suitability score of all offers
     max_ss = 0.0
     for c in all_combs:
         ss = sum(c)
